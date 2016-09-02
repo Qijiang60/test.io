@@ -5,6 +5,27 @@ http://stackoverflow.com/questions/3011680/take-user-input-and-put-it-into-a-fil
 
 
 
+################################################
+from sys import argv
+
+script, filename = argv
+
+txt = open(filename)
+
+print "Here's your file %r:" % filename
+print txt.read()
+
+print "Type the filename again:"
+file_again = raw_input("> ")
+
+txt_again = open(file_again)
+
+print txt_again.read()
+#######################################################
+http://old.sebug.net/paper/books/LearnPythonTheHardWay/ex15.html
+
+
+
 
 
 
