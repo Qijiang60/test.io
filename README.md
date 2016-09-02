@@ -1,3 +1,27 @@
+http://stackoverflow.com/questions/7102030/python-how-to-take-a-txt-file-as-input-from-user-using-raw-input-in-python-and
+http://stackoverflow.com/questions/30876497/open-a-file-from-user-input-in-python-2-7
+http://stackoverflow.com/questions/15194074/how-to-open-a-file-by-user-input-in-python
+http://stackoverflow.com/questions/3011680/take-user-input-and-put-it-into-a-file-in-python
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # test.io
 testing
 # csv2xml.py
