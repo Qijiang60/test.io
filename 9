@@ -1,0 +1,59 @@
+package com.demo.test;
+ 2 
+ 3 import java.io.IOException;
+ 4 
+ 5 import org.apache.http.HttpEntity;
+ 6 import org.apache.http.client.ClientProtocolException;
+ 7 import org.apache.http.client.methods.CloseableHttpResponse;
+ 8 import org.apache.http.client.methods.HttpPost;
+ 9 import org.apache.http.entity.ContentType;
+10 import org.apache.http.entity.StringEntity;
+11 import org.apache.http.impl.client.CloseableHttpClient;
+12 import org.apache.http.impl.client.HttpClients;
+13 import org.apache.http.util.EntityUtils;
+14 
+15 public class Test {
+16 
+17     public static String sendInfo(String sendurl, String data) {
+18         CloseableHttpClient client = HttpClients.createDefault();
+19         HttpPost post = new HttpPost(sendurl);
+20         StringEntity myEntity = new StringEntity(data,
+21                 ContentType.APPLICATION_JSON);// 构造请求数据
+22         post.setEntity(myEntity);// 设置请求体
+23         String responseContent = null; // 响应内容
+24         CloseableHttpResponse response = null;
+25         try {
+26             response = client.execute(post);
+27             if (response.getStatusLine().getStatusCode() == 200) {
+28                 HttpEntity entity = response.getEntity();
+29                 responseContent = EntityUtils.toString(entity, "UTF-8");
+30             }
+31         } catch (ClientProtocolException e) {
+32             e.printStackTrace();
+33         } catch (IOException e) {
+34             e.printStackTrace();
+35         } finally {
+36             try {
+37                 if (response != null)
+38                     response.close();
+39 
+40             } catch (IOException e) {
+41                 e.printStackTrace();
+42             } finally {
+43                 try {
+44                     if (client != null)
+45                         client.close();
+46                 } catch (IOException e) {
+47                     e.printStackTrace();
+48                 }
+49             }
+50         }
+51         return responseContent;
+52     }
+53 
+54     public static void main(String[] args) {
+55         String json = "{\"name\":\"zhangsan\", \"age\":20, \"gender\": \"mail\"} ";
+56         String result = sendInfo("http://www.xxxxx.com/message", json);
+57         System.out.println(result);
+58     }
+59 }
