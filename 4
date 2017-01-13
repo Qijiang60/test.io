@@ -85,3 +85,60 @@ public abstract class TestSend {
     }
 
 }
+
+
+
+
+#########################################################################################
+<%@ page language="java" import="java.util.*,java.io.*" pageEncoding="UTF-8"%>
+<%
+
+    System.out.println("conenction server success!");
+
+    System.out.println(request.getMethod());
+
+    //后台接收
+    InputStreamReader reader=new InputStreamReader(request.getInputStream(),"UTF-8");
+    char [] buff=new char[1024];
+    int length=0;
+    while((length=reader.read(buff))!=-1){
+        
+        String x=new String(buff,0,length);
+        
+        System.out.println(x);
+    }
+
+    
+    //响应
+    out.println("{'responseCommand':'0','requestCommand':'control'}");
+
+%>
+
+
+############################################################################################
+
+所使用的 jar包：
+
+commons-beanutils-1.8.3.jar
+
+commons-codec-1.4.jar
+
+commons-collections-3.2.1.jar
+
+commons-lang-2.5.jar
+
+commons-lang3-3.1.jar
+
+commons-logging-1.1.1.jar
+
+ezmorph-1.0.6.jar
+
+httpclient-4.1.2.jar
+
+httpcore-4.1-alpha1.jar
+
+json-lib-2.4-jdk15.jar
+
+morph-1.1.1.jar
+
+morph-sandbox-1.1.1.jar
