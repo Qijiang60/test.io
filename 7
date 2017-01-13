@@ -1,0 +1,163 @@
+http://www.cnblogs.com/undead/archive/2012/07/18/2594900.html
+
+
+最近在做一个基于JAVA Servlet的WEB应用以及对应的Anroid应用客户端的开发工作。
+
+其中，在接口的访问和数据的传输方面使用的比较多的是使用JSON对象来操作格式化数据：在服务器端采用JSON字符串来传递数据并在WEB前端或者Android客户端使用JSON来解析接收到的数据。
+
+
+首先，在JAVA中使用JSON需要引入 org.json 包（点击 这里 可以下载相应的JAR包！）， 并在程序中引入相应的JSON类：
+
+1 import org.json.JSONArray;
+2 import org.json.JSONException;
+3 import org.json.JSONObject;
+ 
+
+其次，在服务器端的Servlet类中，可以使用如下方法收集数据并生成相应的JSON字符串
+
+复制代码
+1 //声明一个Hash对象并添加数据
+2 Map params =  new HashMap();
+3 
+4 params.put("username", username);
+5 params.put("user_json", user);
+6 
+7 //声明JSONArray对象并输入JSON字符串
+8 JSONArray array = JSONArray.fromObject(params);
+9 put.println(array.toString());
+复制代码
+ 
+
+在WEB前端可以通过javascript直接对JSON字符串进行解析，在Android客户端的话，需要使用JSON类来解析字符串：
+
+复制代码
+ 1 //@description: 根据接收到的JSON字符串来解析字符串中所包含的数据和数据对象
+ 2 
+ 3 //接收到的JSON字符串
+ 4 String result = "[{\"username\": \"your name\", \"user_json\": {\"username\": \"your name\", \"nickname\": \"your nickname\"}}]";
+ 5 
+ 6 //根据字符串生成JSON对象
+ 7 JSONArray resultArray = new JSONArray(result);
+ 8 JSONObject resultObj = resultArray.optJSONObject(0);
+ 9 
+10 //获取数据项
+11 String username = resultObj.getString("username");
+12 
+13 //获取数据对象
+14 JSONObject user = resultObj.getJSONObject("user_json");
+15 String nickname = user.getString("nickname");
+复制代码
+ 
+
+ 其实，主要就是涉及到以下集中数据类型之间的转换：
+
+1. String 转换为JSON对象
+
+复制代码
+ 1 import org.json.JSONArray;
+ 2 import org.json.JSONException;
+ 3 import org.json.JSONObject;
+ 4 
+ 5 //别忘了添加上JSON包哦!
+ 6 public class StringToJSON {
+ 7     public static void main(String[] args) throws JSONException{
+ 8         
+ 9         System.out.println("abc");
+10         //定义JSON字符串
+11         String jsonStr = "{\"id\": 2," + 
+12                 " \"title\": \"json title\", " + 
+13                 "\"config\": {" +
+14                     "\"width\": 34," +
+15                     "\"height\": 35," +
+16                 "}, \"data\": [" +
+17                     "\"JAVA\", \"JavaScript\", \"PHP\"" +
+18                 "]}";
+19         
+20         //转换成为JSONObject对象
+21         JSONObject jsonObj = new JSONObject(jsonStr);
+22         
+23         //从JSONObject对象中获取数据
+24         JavaBean bean = new JavaBean();
+25         
+26         //根据属性名称获取int型数据;
+27         bean.setId(jsonObj.getInt("id"));     
+28         
+29         //根据属性名获取String数据;
+30         bean.setTitle(jsonObj.getString("title")); 
+31         
+32         //根据属性名获取JSONObject类
+33         JSONObject config = jsonObj.getJSONObject("config");
+34         bean.setWidth(config.getInt("width"));
+35         bean.setHeight(config.getInt("height"));
+36         
+37         //根据属性名获取JSONArray数组
+38         JSONArray data = jsonObj.getJSONArray("data");
+39         for(int index = 0, length = data.length(); index < length; index++) {
+40             //这里在org.json.JSONArray对象中居然没有找到toArray方法，求各位网友给出解决办法啊！
+41 //            bean.setLanguages(String[]);
+42         }        
+43     }
+44 }
+45 
+46 class JavaBean{
+47     private int id ;
+48     private String title;
+49     private int width;
+50     private int height;
+51     private String[] languages;
+52 
+53         //这里省略了设置器和访问器
+54 }
+复制代码
+ 
+
+2. JSON对象转换为String字符串
+
+复制代码
+ 1 public static void main(String[] args) throws JSONException {
+ 2         
+ 3         //创建JSONObject对象
+ 4         JSONObject json = new JSONObject();
+ 5         
+ 6         //向json中添加数据
+ 7         json.put("username", "wanglihong");
+ 8         json.put("height", 12.5);
+ 9         json.put("age", 24);
+10         
+11         //创建JSONArray数组，并将json添加到数组
+12         JSONArray array = new JSONArray();
+13         array.put(json);
+14         
+15         //转换为字符串
+16         String jsonStr = array.toString();
+17         
+18         System.out.println(jsonStr);
+19     }
+复制代码
+ 
+
+最终输出结果为： [{"username":"wanglihong","height":12.5,"age":24}]  
+
+3. 集合转换为JSONArray对象
+
+复制代码
+ 1     public static void main(String[] args)throws JSONException{
+ 2         //初始化ArrayList集合并添加数据
+ 3         List<String> list = new ArrayList<String>();
+ 4         list.add("username");
+ 5         list.add("age");
+ 6         list.add("sex");
+ 7         
+ 8         //初始化HashMap集合并添加数组
+ 9         Map map = new HashMap();
+10         map.put("bookname", "CSS3实战");
+11         map.put("price", 69.0);
+12         
+13         //初始化JSONArray对象，并添加数据
+14         JSONArray array = new JSONArray();
+15         array.put(list);
+16         array.put(map);
+17         
+18         //生成的JSON字符串为：[["username","age","sex"],{"price":69,"bookname":"CSS3实战"}]
+19     }
+复制代码
