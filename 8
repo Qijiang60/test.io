@@ -1,0 +1,76 @@
+private void httpReqUrl(List<HongGuTan> list, String url)  
+            throws ClientProtocolException, IOException {  
+  
+        logger.info("httpclient执行新闻资讯接口开始。");  
+        JSONObject json = new JSONObject();  
+        DefaultHttpClient httpClient = new DefaultHttpClient();  
+  
+        HttpPost method = new HttpPost(url);  
+  
+        // 设置代理  
+        if (IS_NEED_PROXY.equals("1")) {  
+            HttpHost proxy = new HttpHost("192.168.13.19", 7777);  
+            httpClient.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY, proxy);  
+        }  
+  
+        if (list != null && list.size() > 0) {  
+            logger.info("循环处理数据列表大小list.size={}", list != null ? list.size() : 0);  
+  
+            // 开始循环组装post请求参数,使用倒序进行处理  
+            for (int i = list.size() - 1; i >= 0; i--) {  
+                HongGuTan bean = list.get(i);  
+                if (bean == null) {  
+                    continue;  
+                }  
+                // 验证参数  
+                Object[] objs = { bean.getTitle(), bean.getContent(),  
+                        bean.getSourceUrl(), bean.getSourceFrom(),  
+                        bean.getImgUrls() };  
+                if (!validateData(objs)) {  
+                    logger.info("参数验证有误。");  
+                    continue;  
+                }  
+                // 接收参数json列表  
+                JSONObject jsonParam = new JSONObject();  
+                jsonParam.put("chnl_id", "11");// 红谷滩新闻资讯，channelId 77  
+                jsonParam.put("title", bean.getTitle());// 标题  
+                jsonParam.put("content", bean.getContent());// 资讯内容  
+                jsonParam.put("source_url", bean.getSourceUrl());// 资讯源地址  
+                jsonParam.put("source_name", bean.getSourceFrom());// 来源网站名称  
+                jsonParam.put("img_urls", bean.getImgUrls());// 采用 url,url,url 的格式进行图片的返回  
+                  
+                StringEntity entity = new StringEntity(jsonParam.toString(),"utf-8");//解决中文乱码问题    
+                entity.setContentEncoding("UTF-8");    
+                entity.setContentType("application/json");    
+                method.setEntity(entity);    
+                  
+                //这边使用适用正常的表单提交   
+  
+//               List<BasicNameValuePair> pairList = new ArrayList<BasicNameValuePair>();    
+                //pairList.add(new BasicNameValuePair("chnl_id", "11"));   
+                //pairList.add(new BasicNameValuePair("title", bean.getTitle()));// 标题    
+                //pairList.add(new BasicNameValuePair("content", bean.getContent()));// 资讯内容    
+                //pairList.add(new BasicNameValuePair("source_url", bean.getSourceUrl()));// 资讯源地址    
+                //pairList.add(new BasicNameValuePair("source_name", bean.getSourceFrom()));// 来源网站名称    
+                //pairList.add(new BasicNameValuePair("img_urls", bean.getImgUrls()));// 采用 url,url,url 的格式进行图片的返回    
+                //method.setEntity(new UrlEncodedFormEntity(pairList, "utf-8"));   
+                  
+                  
+                HttpResponse result = httpClient.execute(method);  
+  
+                // 请求结束，返回结果  
+                String resData = EntityUtils.toString(result.getEntity());  
+                JSONObject resJson = json.parseObject(resData);  
+                String code = resJson.get("result_code").toString(); // 对方接口请求返回结果：0成功  1失败  
+                logger.info("请求返回结果集{'code':" + code + ",'desc':'" + resJson.get("result_desc").toString() + "'}");  
+  
+                if (!StringUtils.isBlank(code) && code.trim().equals("0")) {// 成功  
+                    logger.info("业务处理成功！");  
+                } else {  
+                    logger.error("业务处理异常");  
+                    Constants.dateMap.put("lastMaxId", bean.getId());  
+                    break;  
+                }  
+            }  
+        }  
+    }  
