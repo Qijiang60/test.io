@@ -43,3 +43,28 @@ angular实现页面跳转，并且刷新页面（重新请求后台接口）
 
 3、在目标路由（router）中配置cache:false（禁用缓存）
 
+constructor(private activatedRoute: ActivatedRoute, private router: Router) {
+    /* This part will only be accessable on load only. So, it will not be accessable on Reload. */
+    this.subscriptions.push(this.activatedRoute.queryParams.subscribe(queryParams => {
+    /* This part will be accessable on Reload */
+    this.isInitialized = false;
+    this.ngOnInit();
+    }));
+}
+
+ngOnInit() {
+  if (!this.isInitialized) {
+  this.isInitialized = true;
+  /* Add your Initialization code here */
+  }
+}
+
+getQUeryParams() {
+  let queryParams: any = {};
+  http://queryParams.st = Number(new Date());
+  return queryParams;
+}
+
+reloadPage() {
+  this.router.navigate([this.router.url], { queryParams: this.getQueryParams() });
+}
