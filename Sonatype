@@ -43,3 +43,89 @@ echo “Version is $VERSION”
 
 result should be 6.7 at the moment
 And heck out the blog post http://www.sonatype.com/people/2012/07/learning-the-nexus-rest-api-read-the-docs-or-fire-up-a-browser/ about how to use the browser debug tools to monitor rest api calls of the nexus user interface itself
+/////////////////////////////////////////////////////////////
+
+
+http://www.aizhuanji.com/a/PxDAlZ8w.html
+Get status
+curl http://localhost:8081/nexus/service/local/status
+
+should display something like
+Sonatype Nexus Professional
+Sonatype Nexus&trade; Professional Edition, Version: 2.1.2
+2.1.2
+2.1.2
+Professional
+PRO
+…
+List of repositories
+curl http://localhost:8081/nexus/service/local/repositories
+
+Getting a list of all users, now with authenticating as admin user
+curl -X GET -u admin:admin123 http://localhost:8081/nexus/service/local/users
+
+result e.g.
+http://localhost:8081/nexus/service/local/users/anonymous
+anonymous
+…
+Search for an artifact (keyword search)
+use http://localhost:8081/nexus/nexus-indexer-lucene-plugin/default/docs/rest.lucene.search.html
+curl -X GET -u admin:admin123 http://localhost:8081/nexus/service/local/lucene/search?q=testng
+
+or better GAV search
+curl -X GET -u admin:admin123 http://localhost:8081/nexus/service/local/lucene/search?g=org.testng&a=testng&v=6.7
+
+get pom
+documentation at http://localhost:8081/nexus/nexus-core-documentation-plugin/core/docs/rest.artifact.maven.html
+curl -X GET -u admin:admin123 http://localhost:8081/nexus/service/local/artifact/maven?r=central&g=junit&a=junit&v=4.10
+
+get artifact
+documentation at http://localhost:8081/nexus/nexus-core-documentation-plugin/core/docs/rest.artifact.maven.content.html
+curl -X GET -u admin:admin123 “http://localhost:8081/nexus/service/local/artifact/maven/content?g=org.testng&a=testng&v=LATEST&r=central”
+
+resolve details about latest version of testng
+curl -X GET -u admin:admin123 “http://localhost:8081/nexus/service/local/artifact/maven/resolve?r=central&g=org.testng&a=testng&v=LATEST”
+
+above snippet in a shell script extracting the version could look like this:
+VERSION=curl -X GET -u admin:admin123 "http://localhost:8081/nexus/service/local/artifact/maven/resolve?r=central&g=org.testng&a=testng&v=LATEST" | sed -n 's|<version>\(.*\)</version>|\1|p' 
+echo “Version is $VERSION”
+
+result should be 6.7 at the moment
+And heck out the blog post http://www.sonatype.com/people/2012/07/learning-the-nexus-rest-api-read-the-docs-or-fire-up-a-browser/ about how to use the browser debug tools to monitor rest api calls of the nexus user interface itself
+Contact GitHub API Training Shop Blog About
+
+Similar Posts:
+使用命令行和Eclipse两种方式编译Sonatype Nexus
+本文参考了http://toozhao.com/2012/07/maven-compile-nexus/以及https://github.com/sonatype/nexus下部的readme,再次对这两篇文章的作者表示感谢,下面进入正文. 要编译Nexus你需要有以下东西: 1. Nexus的源代码 2. Maven 3.0.4或以上版本(注意,如果你想使用M2Eclipse在Eclipse中进行编译,还有一些要注意的地方,文章后面会单独说,这里暂时只说在命令行下编译) 下载好源代码并配置好M
+
+CentOS 安装 SonaType Nexus Maven Repository以及旧库迁移
+转载:http://www.cnblogs.com/zhangqingsh/archive/2013/03/14/2959301.html 1. CentOS下安装SonaType Nexus: 1.1 下载SonaTYpe Nexus: cd /usr/local/src wget http://download.sonatype.com/nexus/oss/nexus-2.3.1-01-bundle.tar.gz 1.2 安装: cd /usr/local/src sudo cp nexus
+
+安装Maven私服—Sonatype nexus
+Nexus 是Maven仓库管理器.它可以节省网络带宽也会加速项目搭建的进程. 方法/步骤 下载ZIP版本的Sonatype nexus 解压nexus到本地磁盘 配置nexus环境变量.把nexus目录的bin添加到path中 下载并安装JDK 把jdk目录下bin/lib分别添加到path/classpath中 打开cmd.exe并输入java -version,检测jdk是否正确安装 打开cmd.exe并输入nexus.按回车键 再按任意键继续,输入nexus install按回车键.即可
+
+Sonatype Nexus搭建Maven仓库
+Sonatype Nexus搭建Maven仓库 Sonatype Nexus搭建Maven仓库 安装 准备工作 下载 安装位置 启动 启动成功 安装 准备工作 Nexus运行需要Java运行时环境(JRE),官方文档声称不支持OpenJDK,所以需要安装Oracle JRE 或者 Oracle JDK,怎么安装JRE网上有很多,请自行搜索. 下载 在sonatype官网下载 Nexus OSS. 我下载的是TGZ版本,所以下载得到nexus-2.11.4-01-bundle.tar.gz ) 安
+
+Sonatype Nexus
+Sonatype OSS Manage Artifacts https://oss.sonatype.org/index.html#welcome
+
+Sonatype Nexus库被删除后的恢复
+今天不小心把公司的私服上的一个库给删除了,幸好从网上找到办法恢复了,感谢网上的大牛,感谢互联网分享精神: 大致恢复流程为: 1.sonatype-work/nexus/trash 下找到你删除的库,并保存到其他地方,需要能连接上maven私服服务器 2.在私服管理网站上通过nexus控制台点击Add,选择Hosted Repository,然后输入被删除的Repository信息:需要id.name等和以前的一样,可以从管理网站上找到,然后点击保存: 3.把刚才保存的库文件copy到指定的son
+
+试用 Nexus OSS 3.0 的docker仓库 （一）
+Nexus 3.0 可以创建三种docker仓库: 1. docker (proxy) 代理和缓存远程仓库 ,只能pull 2. docker (hosted) 托管仓库 ,私有仓库,可以push和pull 3. docker (group) 将多个proxy和hosted仓库添加到一个组,只访问一个组地址即可,只能pull 一. 配置Nexus 3.0 经过测试, Nexus必须启动https,否则只能通过localhost登陆,hosted仓库也不能push.https证书可以到CA购买,也
+
+Nexus仓库构建
+1 . 私服简介 私服是架设在局域网的一种特殊的远程仓库,目的是代理远程仓库及部署第三方构件.有了私服之后,当 Maven 需要下载构件时,直接请求私服,私服上存在则下载到本地仓库:否则,私服请求外部的远程仓库,将构件下载到私服,再提供给本地仓库下载. 我们可以使用专门的 Maven 仓库管理软件来搭建私服,比如:Apache Archiva,Artifactory,Sonatype Nexus.这里我们使用 Sonatype Nexus. 2 . 安装Nexus 2 . 1 . 下载Nexus
+
+Nexus启动失败The nexus-webapp service was launched, bu
+JDK:版本1.6 下了最新版的nexus-2.7.2-03,却始终运行不起来,显示The nexus-webapp service was launched, but failed to start. 查看%Nexus_HOME%下logs目录下的日志文件,报错: JVM... jvm 5 | java.lang.UnsupportedClassVersionError: org/sonatype/nexus/bootstrap jsw/JswLauncher : Unsupported ma
+
+nexus中文路径问题
+sonatype nexus路径中文问题 在网上并没有找到相关解决方案,无奈下尝试了一下unicode,居然可行,故分享给大家,希望可以帮助和曾经的我遇到同样问题的你 #nexus-work=E:\me\\\u5FEB\u76D8\\sonatype\\sonatype-work\\nexus nexus-work=E:/me/\u5FEB\u76D8/sonatype/sonatype-work/nexus 汉字用unicode即可,否则抛异常,启动不了,另外,如果在windows下如果路径用
+
+
+
+
+
